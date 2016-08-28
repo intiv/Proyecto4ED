@@ -28,5 +28,8 @@ public abstract class Human {
         this.breaks = breaks;
     }
     
+    public void reduce(){
+        breaks--;
+    }
     
 }
