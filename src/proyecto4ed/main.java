@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -95,27 +94,28 @@ public class main extends javax.swing.JFrame {
                         }
                     }
                     if (sets.isEmpty()) {
-                        sets.add(new HashSet());
+                        sets.add(new Set());
                     }
                     while (!personas.isEmpty()) {
                         Random rand = new Random();
                         int index = rand.nextInt(sets.size());
                         int cualpersona = rand.nextInt(personas.size());
                         if (sets.get(index).isEmpty()) {
-                            if (personas.get(cualpersona).getBreaks() == 0) {
-                                personas.get(cualpersona).setBreaks(2);
-                                sets.get(index).add(personas.get(cualpersona));
+                            if (sets.get(index).add(personas.get(cualpersona)) && sets.get(index).get(0).getBreaks() == 0) {
                                 personas.remove(cualpersona);
+                                sets.get(index).get(0).setBreaks(2);
                             }
-                        } else if (sets.get(index).size() < 4 && personas.get(cualpersona) instanceof Couple) {
-                            if(!sets.get(index).contains(personas.get(cualpersona))){
-                                if(personas.get(cualpersona).getBreaks()>0)
-                                    personas.get(cualpersona).reduce();
-                                sets.get(index).add(personas.get(cualpersona));
-                                personas.remove(cualpersona);
-                                
+                        } else if (sets.get(index).persons < 4 && personas.get(cualpersona) instanceof Couple) {
+                            if (!sets.get(index).contains(personas.get(cualpersona))) {
+                                if (sets.get(index).add(personas.get(cualpersona))) {
+                                    personas.remove(cualpersona);
+                                    if (sets.get(index).get(sets.get(index).size() - 1).getBreaks() > 0) {
+                                        sets.get(index).get(sets.get(index).size() - 1).reduce();
+                                    }
+                                }
                             }
                         }
+                        
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Archivo incorrecto. Solo se aceptan archivos txt!");
@@ -151,10 +151,8 @@ public class main extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new main().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new main().setVisible(true);
         });
     }
 
