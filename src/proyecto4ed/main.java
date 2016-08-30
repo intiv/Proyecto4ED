@@ -6,11 +6,12 @@
 package proyecto4ed;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Random;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -72,60 +73,98 @@ public class main extends javax.swing.JFrame {
 
     private void bLoadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bLoadMouseClicked
         try {
-            String dir = System.getProperty("user.home");
-            JFileChooser chooser = new JFileChooser(dir + "/Desktop");
+            String desktop = System.getProperty("user.home");
+            JFileChooser chooser = new JFileChooser(desktop + "/Desktop");
             chooser.setAcceptAllFileFilterUsed(false);
             FileFilter filter = new FileNameExtensionFilter(null, "txt");
             chooser.setFileFilter(filter);
             if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 if (chooser.getSelectedFile().getName().endsWith(".txt")) {
                     File file = chooser.getSelectedFile();
-                    FileReader in = new FileReader(file);
-                    BufferedReader reader = new BufferedReader(in);
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        if (line.contains(" y ")) {
-                            String[] names = line.split(" y ");
-                            Couple pareja = new Couple(names[0], names[1], 0);
-                            personas.add(pareja);
-                        } else {
-                            Person persona = new Person(line);
-                            personas.add(persona);
-                        }
-                    }
-                    if (sets.isEmpty()) {
-                        sets.add(new Set());
-                    }
-                    while (!personas.isEmpty()) {
-                        Random rand = new Random();
-                        int index = rand.nextInt(sets.size());
-                        int cualpersona = rand.nextInt(personas.size());
-                        if (sets.get(index).isEmpty()) {
-                            if (sets.get(index).add(personas.get(cualpersona)) && sets.get(index).get(0).getBreaks() == 0) {
-                                personas.remove(cualpersona);
-                                sets.get(index).get(0).setBreaks(2);
+                    try (FileReader in = new FileReader(file); BufferedReader reader = new BufferedReader(in)) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            if (line.contains(" y ")) {
+                                String[] names = line.split(" y ");
+                                Couple pareja = new Couple(names[0], names[1], 0);
+                                personas.add(pareja);
+                            } else {
+                                Person persona = new Person(line,0);
+                                personas.add(persona);
                             }
-                        } else if (sets.get(index).persons < 4 && personas.get(cualpersona) instanceof Couple) {
-                            if (!sets.get(index).contains(personas.get(cualpersona))) {
-                                if (sets.get(index).add(personas.get(cualpersona))) {
-                                    personas.remove(cualpersona);
-                                    if (sets.get(index).get(sets.get(index).size() - 1).getBreaks() > 0) {
-                                        sets.get(index).get(sets.get(index).size() - 1).reduce();
+                        }
+                        if (sets.isEmpty()) {
+                            sets.add(new Set());
+                        }
+                        while (!personas.isEmpty()) {
+                            Random rand = new Random();
+                            int cualpersona = rand.nextInt(personas.size());
+                            if(allSetsFull(sets,personas.get(cualpersona)))
+                                sets.add(new Set());
+                            int index = rand.nextInt(sets.size());
+                            
+                            System.out.println("Curr person "+personas.get(cualpersona)+" index: "+index+" cp: "+cualpersona);
+                            if (sets.get(index).isEmpty()) {
+                                if (personas.get(cualpersona).getBreaks() == 0) {
+                                    if (sets.get(index).add(personas.get(cualpersona))) {
+                                        personas.remove(cualpersona);
+                                        sets.get(index).get(0).setBreaks(2);
+                                    }
+                                }
+                            } else if (sets.get(index).people() < 4 && personas.get(cualpersona) instanceof Couple) {
+                                if (!sets.get(index).contains(personas.get(cualpersona))) {
+                                    if (sets.get(index).add(personas.get(cualpersona))) {
+                                        personas.remove(cualpersona);
+                                        if (sets.get(index).get(sets.get(index).size() - 1).getBreaks() > 0) {
+                                            sets.get(index).get(sets.get(index).size() - 1).reduce();
+                                        }
+                                    }
+                                }
+                            } else if (sets.get(index).people() < 5 && personas.get(cualpersona) instanceof Person) {
+                                if (!sets.get(index).contains(personas.get(cualpersona))) {
+                                    if (sets.get(index).add(personas.get(cualpersona))) {
+                                        personas.remove(cualpersona);
+                                        if (sets.get(index).get(sets.get(index).size() - 1).getBreaks() > 0) {
+                                            sets.get(index).get(sets.get(index).size() - 1).reduce();
+                                        }
                                     }
                                 }
                             }
                         }
+                        File dir=new File("./Sets.txt");
+                        if(dir.exists()){
+                            dir.delete();
+                        }
+                        FileWriter out=new FileWriter(dir);
+                        BufferedWriter writer=new BufferedWriter(out);
                         
+                        System.out.println("People");
+                        for (int i = 0; i < sets.size(); i++) {
+                            writer.write("Set: "+i);
+                            for (int j = 0; j < sets.get(i).size(); j++) {
+                                writer.write(sets.get(i).get(j).toString());
+                            }
+                        }
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Archivo incorrecto. Solo se aceptan archivos txt!");
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
 
         }
     }//GEN-LAST:event_bLoadMouseClicked
 
+    public static boolean allSetsFull(ArrayList<Set> sets, Human current){
+        int max=5;
+        if(current instanceof Couple)
+            max=4;
+        for (int i = 0; i < sets.size(); i++) {
+            if(sets.get(i).people()<max)
+                return false;
+        }
+        return true;
+    }
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

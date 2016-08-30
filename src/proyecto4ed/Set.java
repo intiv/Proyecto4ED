@@ -72,6 +72,8 @@ public class Set {
     }
     
     public Human get(int index){
+        //if(index<0||index>=members.size())
+          //  return null;
         return members.get(index);
     }
 }

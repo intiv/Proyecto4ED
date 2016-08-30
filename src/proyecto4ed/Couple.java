@@ -19,7 +19,7 @@ public class Couple extends Human{
     
     Couple(String name1, String name2, int breaks){
         super(breaks);
-        person1=new Person(name1);
-        person2=new Person(name2);
+        person1=new Person(name1,0);
+        person2=new Person(name2,0);
     }
 }

@@ -14,10 +14,12 @@ public class Person extends Human{
     private String name;
     
     Person(){
+        super();
         name="";
     }
     
-    Person(String name){
+    Person(String name, int breaks){
+        super(breaks);
         this.name=name;
     }
 
