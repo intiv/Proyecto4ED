@@ -22,4 +22,11 @@ public class Couple extends Human{
         person1=new Person(name1,0);
         person2=new Person(name2,0);
     }
+
+    @Override
+    public String toString() {
+        return "Couple{" +  person1 + ", " + person2 + '}';
+    }
+    
+    
 }

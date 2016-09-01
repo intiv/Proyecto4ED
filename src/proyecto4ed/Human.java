@@ -5,31 +5,45 @@
  */
 package proyecto4ed;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author USUARIO-PC
  */
 public abstract class Human {
     protected int breaks;
-    
+    ArrayList<Human> conocidos;
     Human(){
         breaks=0;
+        conocidos=null;
     }
     
     Human(int breaks){
         this.breaks=breaks;
+        conocidos=new ArrayList();
     }
 
     public int getBreaks() {
         return breaks;
     }
 
+    public boolean knows(Human asked){
+        return conocidos.contains(asked);
+    }
+    
+    public void meet(Human asked){
+        if(!conocidos.contains(asked))
+            conocidos.add(asked);
+    }
+    
     public void setBreaks(int breaks) {
         this.breaks = breaks;
     }
     
     public void reduce(){
-        breaks--;
+        if(breaks>0)
+            breaks--;
     }
     
 }
