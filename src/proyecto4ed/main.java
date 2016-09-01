@@ -100,15 +100,33 @@ public class main extends javax.swing.JFrame {
                                 while (!forced) {
                                     int which = rand.nextInt(sets.size());
                                     //System.out.println(personas.get(cualpersona)+", "+which+"");
-                                    if(allSetsForced(sets))
-                                        forced=true;
-                                    if (!sets.get(which).Forced()||forced) {
+                                    if (allSetsForced(sets)) {
+                                        forced = true;
+                                    }
+                                    if (!sets.get(which).Forced() || forced) {
                                         sets.get(which).add(personas.get(cualpersona), true);
                                         personas.remove(cualpersona);
                                         forced = true;
                                     }
                                 }
-                            } else if (allSetsFull(sets, personas.get(cualpersona)) && personas.get(cualpersona) instanceof Couple) {
+                            } else if (allSetsFull(sets, personas.get(cualpersona)) && !allCoupleSlotsTaken(sets) && personas.get(cualpersona) instanceof Couple) {
+                                System.out.println(personas.get(cualpersona) + " entro al primer else");
+                                boolean forced = false;
+                                while (!forced) {
+                                    int which = rand.nextInt(sets.size());
+                                    if (sets.get(which).CoupleSlotAvailable()) {
+                                        Human h1 = sets.get(which).remove(rand.nextInt(sets.get(which).size()));
+                                        Human h2 = sets.get(which).remove(rand.nextInt(sets.get(which).size()));
+                                        personas.get(cualpersona).reduce();
+                                        if (sets.get(which).add(personas.get(cualpersona), true)) {
+                                            personas.remove(cualpersona);
+                                            personas.add(h1);
+                                            personas.add(h2);
+                                            forced = true;
+                                        }
+                                    }
+                                }
+                            } else if (allSetsFull(sets, personas.get(cualpersona)) && allCoupleSlotsTaken(sets) && personas.get(cualpersona) instanceof Couple) {
                                 System.out.println(personas.get(cualpersona) + " entro al primer else");
                                 boolean forced = false;
                                 while (!forced) {
@@ -185,10 +203,11 @@ public class main extends javax.swing.JFrame {
     public static boolean allSetsFull(ArrayList<Set> sets, Human current) {
         int max = 5;
         for (int i = 0; i < sets.size(); i++) {
-            if (sets.get(i).Forced()) 
-                max=6;
-            else
-                max=5;
+            if (sets.get(i).Forced()) {
+                max = 6;
+            } else {
+                max = 5;
+            }
             if (sets.get(i).people() < max) {
                 return false;
             }
@@ -205,11 +224,12 @@ public class main extends javax.swing.JFrame {
         }
         return true;
     }
-    
-    public static boolean allSetsForced(ArrayList<Set> sets){
+
+    public static boolean allSetsForced(ArrayList<Set> sets) {
         for (Set set : sets) {
-            if(!set.Forced())
+            if (!set.Forced()) {
                 return false;
+            }
         }
         return true;
     }
