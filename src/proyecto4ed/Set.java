@@ -105,6 +105,9 @@ public class Set {
             return null;
         Human temp=members.get(index);
         members.remove(index);
+        if(temp instanceof Couple)
+            persons--;
+        persons--;
         return temp;
     }
 
