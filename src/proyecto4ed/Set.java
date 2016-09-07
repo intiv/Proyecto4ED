@@ -13,15 +13,17 @@ import java.util.ArrayList;
  */
 public class Set {
 
-    boolean onecouple, hasForced;
-    int persons;
-    ArrayList<Human> members;
+    private boolean onecouple, hasForced;
+    private int max;
+    private int persons;
+    private ArrayList<Human> members;
 
-    Set() {
+    Set(int n) {
         onecouple = false;
         hasForced=false;
         persons = 0;
         members = new ArrayList();
+        max=n;
     }
 
     public boolean isEmpty() {
@@ -54,19 +56,33 @@ public class Set {
         return members.contains(searched);
     }
 
+    public boolean CoupleFits(boolean OneCouple){
+        if(OneCouple){
+            if(CoupleSlotAvailable()&&persons<=max-2)
+                return true;
+        }else{
+            if(persons<=max-2)
+                return true;
+        }
+        return false;
+    }
+    
     public boolean add(Human persona, boolean forced) {
+        if(persons==0)
+            if(persona.getBreaks()>0)
+                return false;
         if (!forced) {
-            if (persons == 5) {
+            if (persons == max) {
                 return false;
             }
             if (persona instanceof Couple) {
-                if (persons <= 3 && CoupleSlotAvailable()) {
+                if (persons <= max-2 && CoupleSlotAvailable()) {
                     members.add(persona);
                     persons++;
                 } else {
                     return false;
                 }
-            } else if (persons <= 4) {
+            } else if (persons <= max-1) {
                 members.add(persona);
             } else {
                 return false;
@@ -78,6 +94,8 @@ public class Set {
             if(persona instanceof Couple)
                 persons++;
         }
+        if(members.size()==1)
+            members.get(0).setBreaks(2);
         persons++;
         return true;
     }
