@@ -18,14 +18,14 @@ public class Couple extends Human{
     }
     
     Couple(String name1, String name2, int breaks){
-        super(breaks);
+        super(name1+" y "+name2,breaks);
         person1=new Person(name1,0);
         person2=new Person(name2,0);
     }
 
     @Override
     public String toString() {
-        return "Couple{" +  person1 + ", " + person2 + '}';
+        return "Pareja: " +  person1.getName() + " y " + person2.getName();
     }
     
     

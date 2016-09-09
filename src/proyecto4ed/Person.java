@@ -11,29 +11,19 @@ package proyecto4ed;
  */
 public class Person extends Human{
     
-    private String name;
+    
     
     Person(){
         super();
-        name="";
     }
     
     Person(String name, int breaks){
-        super(breaks);
-        this.name=name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        super(name,breaks);
     }
 
     @Override
     public String toString() {
-        return "Person{" + "name=" + name +'}';
+        return "Person: "+super.toString();
     }
     
 }

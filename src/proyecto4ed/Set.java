@@ -13,13 +13,13 @@ import java.util.ArrayList;
  */
 public class Set {
 
-    private boolean onecouple, hasForced;
-    private int max;
+    private boolean hasForced;
+    private final int max;
     private int persons;
-    private ArrayList<Human> members;
+    private final ArrayList<Human> members;
 
     Set(int n) {
-        onecouple = false;
+        
         hasForced=false;
         persons = 0;
         members = new ArrayList();
@@ -77,17 +77,20 @@ public class Set {
             }
             if (persona instanceof Couple) {
                 if (persons <= max-2 && CoupleSlotAvailable()) {
+                    persona.reduce();
                     members.add(persona);
                     persons++;
                 } else {
                     return false;
                 }
             } else if (persons <= max-1) {
+                
                 members.add(persona);
             } else {
                 return false;
             }
         }else{
+            
             members.add(persona);
             if(!hasForced)
                 hasForced=true;
@@ -108,9 +111,21 @@ public class Set {
         if(temp instanceof Couple)
             persons--;
         persons--;
+        if(persons<=max)
+            hasForced=false;
         return temp;
     }
 
+    public void reinsert(Human persona){
+        members.add(persona);
+        
+        persons++;
+        if(persona instanceof Couple)
+            persons++;
+        if(persons>max)
+            hasForced=true;
+    }
+    
     public boolean Forced(){
         return hasForced;
     }
@@ -123,5 +138,11 @@ public class Set {
         if(index<0||index>=members.size())
           return null;
         return members.get(index);
+    }
+    
+    public void clear(){
+        members.clear();
+        persons=0;
+        hasForced=false;
     }
 }
