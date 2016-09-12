@@ -18,8 +18,7 @@ public class Set {
     private int persons;
     private final ArrayList<Human> members;
 
-    Set(int n) {
-        
+    Set(int n) {       
         hasForced=false;
         persons = 0;
         members = new ArrayList();
