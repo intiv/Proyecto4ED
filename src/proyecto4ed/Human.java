@@ -13,19 +13,20 @@ import java.util.ArrayList;
  */
 public abstract class Human {
     protected String name;
+    protected int originalbreaks;
     protected int breaks;
     protected ArrayList<Human> conocidos;
     protected boolean added;
     
     Human(){
-        breaks=0;
+        originalbreaks=breaks=0;
         conocidos=null;
         added=false;
     }
     
     Human(String name, int breaks){
         this.name=name;
-        this.breaks=breaks;
+        originalbreaks=this.breaks=breaks;
         conocidos=new ArrayList();
     }
 
@@ -43,6 +44,18 @@ public abstract class Human {
 
     public boolean isAdded(){
         return this.added;
+    }
+    
+    public int getOriginalBreaks(){
+        return this.originalbreaks;
+    }
+    
+    public void UpdateBreaks(){
+        originalbreaks=breaks;
+    }
+    
+    public void revertbreaks(){
+        breaks=originalbreaks;
     }
     
     public boolean knows(Human asked){

@@ -68,7 +68,7 @@ public class Set {
     
     public boolean add(Human persona, boolean forced) {
         if(persons==0)
-            if(persona.getBreaks()>0)
+            if(persona.getOriginalBreaks()>0)
                 return false;
         if (!forced) {
             if (persons == max) {

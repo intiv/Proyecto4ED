@@ -232,11 +232,12 @@ public class main extends javax.swing.JFrame {
                                     if (!sets.get(index).contains(personas.get(cualpersona))) {
                                         if (sets.get(index).add(personas.get(cualpersona), false)) {
                                             personas.get(cualpersona).SetAdded(true);
-                                            cont=0;
+                                            cont = 0;
                                             if (sets.get(index).size() > 1) {
                                                 personas.get(cualpersona).reduce();
-                                                
+
                                             }
+                                                
                                         }
                                     }
                                 } else if (allSetsFull(sets, personas.get(cualpersona), n) && !allCoupleSlotsTaken(sets)) {
@@ -255,6 +256,7 @@ public class main extends javax.swing.JFrame {
                                                 }
 
                                             }
+
                                             forced = false;
                                             Human h2 = null;
                                             while (!forced) {
@@ -271,9 +273,11 @@ public class main extends javax.swing.JFrame {
                                                     personas.get(cualpersona).reduce();
                                                     personas.get(cualpersona).SetAdded(true);
                                                     personas.get(personas.indexOf(h1)).SetAdded(false);
+                                                    personas.get(personas.indexOf(h1)).revertbreaks();
                                                     personas.get(personas.indexOf(h2)).SetAdded(false);
+                                                    personas.get(personas.indexOf(h2)).revertbreaks();
                                                     forced = true;
-                                                    cont=0;
+                                                    cont = 0;
                                                 }
                                             }
                                         }
@@ -311,23 +315,32 @@ public class main extends javax.swing.JFrame {
                                                 personas.get(cualpersona).reduce();
                                                 personas.get(cualpersona).SetAdded(true);
                                                 personas.get(personas.indexOf(h1)).SetAdded(false);
+                                                personas.get(personas.indexOf(h1)).revertbreaks();
                                                 personas.get(personas.indexOf(h2)).SetAdded(false);
+                                                personas.get(personas.indexOf(h2)).revertbreaks();
                                                 forced = true;
-                                                cont=0;
+                                                cont = 0;
                                             }
                                         }
                                     }
                                 } else if (cont > 150) {
                                     if (!personas.get(cualpersona).isAdded()) {
                                         personas.get(cualpersona).SetAdded(true);
-                                        personas.get(cualpersona).reduce();
-                                        int cual=LowestPackedUnforcedSet(sets);
-                                        if(cual==-1)
-                                            cual=LowestPackedSet(sets);
-                                        if(cual!=-1){
+
+                                        int cual = LowestPackedUnforcedSet(sets);
+                                        if (cual == -1) {
+                                            cual = LowestPackedSet(sets);
+                                        }
+                                        if (cual != -1) {
                                             sets.get(cual).reinsert(personas.get(cualpersona));
-                                        }else
+                                            if (sets.get(cual).size() != 1) {
+                                                personas.get(cualpersona).reduce();
+                                            } else {
+                                                personas.get(cualpersona).setBreaks(2);
+                                            }
+                                        } else {
                                             sets.get(index).reinsert(personas.get(cualpersona));
+                                        }
                                         cont = 0;
                                     }
                                 }
@@ -343,7 +356,7 @@ public class main extends javax.swing.JFrame {
                                                     personas.get(cualpersona).reduce();
                                                 }
                                                 personas.get(cualpersona).SetAdded(true);
-                                                cont=0;
+                                                cont = 0;
                                             }
                                         }
                                     }
@@ -378,26 +391,46 @@ public class main extends javax.swing.JFrame {
                                                 personas.get(cualpersona).reduce();
                                                 personas.get(cualpersona).SetAdded(true);
                                                 personas.get(personas.indexOf(h1)).SetAdded(false);
+                                                personas.get(personas.indexOf(h1)).revertbreaks();
                                                 personas.get(personas.indexOf(h2)).SetAdded(false);
+                                                personas.get(personas.indexOf(h2)).revertbreaks();
                                                 forced = true;
-                                                cont=0;
+                                                cont = 0;
                                             }
                                         }
                                     }
-                                }else if (cont > 150) {
+                                } else if (cont > 150) {
                                     if (!personas.get(cualpersona).isAdded()) {
                                         personas.get(cualpersona).SetAdded(true);
-                                        personas.get(cualpersona).reduce();
-                                        int cual=LowestPackedUnforcedSet(sets);
-                                        if(cual==-1)
-                                            cual=LowestPackedSet(sets);
-                                        if(cual!=-1){
+                                        boolean validset = false;
+                                        int cual = -1;
+                                        while (!validset) {
+                                            cual = LowestPackedUnforcedSet(sets);
+                                            if (cual == -1) {
+                                                cual = LowestPackedSet(sets);
+                                            }
+                                            if (sets.get(cual).size() == 0) {
+                                                if (personas.get(cualpersona).getOriginalBreaks() != 2) {
+                                                    validset = true;
+                                                }
+                                            } else {
+                                                validset = true;
+                                            }
+
+                                        }
+                                        if (cual != -1) {
                                             sets.get(cual).reinsert(personas.get(cualpersona));
-                                        }else
+                                            if (sets.get(cual).size() != 1) {
+                                                personas.get(cualpersona).reduce();
+                                            } else {
+                                                personas.get(cualpersona).setBreaks(2);
+                                            }
+                                        } else {
                                             sets.get(index).reinsert(personas.get(cualpersona));
+                                        }
                                         cont = 0;
                                     }
-                                } else {
+                                }/* else {
                                     System.out.println(personas.get(cualpersona) + " couple y allsetsforced");
                                     boolean valid = false;
                                     Human h1 = null;
@@ -423,12 +456,14 @@ public class main extends javax.swing.JFrame {
                                         if (sets.get(index).add(personas.get(cualpersona), true)) {
                                             personas.get(cualpersona).reduce();
                                             personas.get(cualpersona).SetAdded(true);
-                                            cont=0;
+                                            cont = 0;
                                             personas.get(personas.indexOf(h1)).SetAdded(false);
+                                            personas.get(personas.indexOf(h1)).revertbreaks();
                                             personas.get(personas.indexOf(h2)).SetAdded(false);
+                                            personas.get(personas.indexOf(h2)).revertbreaks();
                                         }
                                     }
-                                }
+                                }*/
                             } else if (personas.get(cualpersona) instanceof Person) {
 
                                 if (sets.get(index).people() < n) {
@@ -439,7 +474,7 @@ public class main extends javax.swing.JFrame {
                                                 personas.get(cualpersona).reduce();
                                             }
                                             personas.get(cualpersona).SetAdded(true);
-                                            cont=0;
+                                            cont = 0;
                                             //sets.get(index).get(sets.get(index).size() - 1).reduce();
                                         }
                                     }
@@ -447,22 +482,23 @@ public class main extends javax.swing.JFrame {
                                     int which = LowestPackedUnforcedSet(sets);
                                     System.out.println(personas.get(cualpersona) + " entro al primer else de person");
                                     System.out.println(which);
-                                    if (which != -1) {
+                                    //if (which != -1) {
                                         if (sets.get(index).add(personas.get(cualpersona), true)) {
                                             personas.get(cualpersona).SetAdded(true);
                                             personas.get(cualpersona).reduce();
-                                            cont=0;
+                                            cont = 0;
                                         }
-                                    } else {
+                                    /*} else {
                                         which = LowestPackedSet(sets);
                                         if (which != -1) {
-                                            if (sets.get(index).add(personas.get(cualpersona), true)) {
+                                            if (sets.get(which).add(personas.get(cualpersona), true)) {
                                                 personas.get(cualpersona).SetAdded(true);
-                                                cont=0;
+                                                cont = 0;
                                                 personas.get(cualpersona).reduce();
                                             }
-                                        }
-                                    }
+                                        }else
+                                            if(sets.get(index).add(personas.get(cualpersona), true))
+                                    }*/
                                 } else if (allSetsFull(sets, personas.get(cualpersona), n) && allSetsForced(sets)) {
                                     System.out.println(personas.get(cualpersona) + " entro al ultimo else de person");
                                     int which = LowestPackedSet(sets);
@@ -471,25 +507,33 @@ public class main extends javax.swing.JFrame {
                                         if (sets.get(which).add(personas.get(cualpersona), true)) {
                                             personas.get(cualpersona).SetAdded(true);
                                             personas.get(cualpersona).reduce();
-                                            cont=0;
+                                            cont = 0;
                                         }
                                     }
-                                }else if (cont > 150) {
+                                } else if (cont > 150) {
                                     if (!personas.get(cualpersona).isAdded()) {
-                                        personas.get(cualpersona).SetAdded(true);
-                                        personas.get(cualpersona).reduce();
-                                        int cual=LowestPackedUnforcedSet(sets);
-                                        if(cual==-1)
-                                            cual=LowestPackedSet(sets);
-                                        if(cual!=-1){
+                                        int cual = LowestPackedUnforcedSet(sets);
+                                        if (cual == -1) {
+                                            cual = LowestPackedSet(sets);
+                                        }
+                                        if (cual != -1) {
                                             sets.get(cual).reinsert(personas.get(cualpersona));
-                                        }else
+                                            if (sets.get(cual).size() != 1) {
+                                                personas.get(cualpersona).reduce();
+                                            }
+
+                                        } else {
                                             sets.get(index).reinsert(personas.get(cualpersona));
+                                        }
+                                        personas.get(cualpersona).SetAdded(true);
                                         cont = 0;
                                     }
                                 }
                             }
                         }
+                    }
+                    for (Human persona: personas) {
+                        persona.UpdateBreaks();
                     }
                     if (dir.exists()) {
                         if (VerifySets(dir, sets, n)) {
@@ -562,7 +606,6 @@ public class main extends javax.swing.JFrame {
 
     private void bVerifyMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bVerifyMouseClicked
         if (!personas.isEmpty()) {
-            
             if (EveryoneKnowsEachOther(personas, grafo)) {
                 JOptionPane.showMessageDialog(this, "Todo conocen la casa de todos los demas!");
             } else {
@@ -575,39 +618,40 @@ public class main extends javax.swing.JFrame {
 
     public static boolean VerifySets(File file, ArrayList<Set> sets, int n) {
         try {
-            for(Set set: sets){
-                if(set.get(0).getBreaks()!=2)
+            for (Set set : sets) {
+                if (set.get(0).getOriginalBreaks() != 2) {
                     return false;
-            }
-            FileReader read = new FileReader(file);
-            BufferedReader reader=new BufferedReader(read);
-            ArrayList<Set> temp = new ArrayList();
-            String rLine;
-            while((rLine=reader.readLine())!=null){
-                if(rLine.contains("Set: "))
-                    temp.add(new Set(n));
-                else{
-                    if(rLine.contains(" y ")){
-                        String[] nombres=rLine.split(" y ");
-                        temp.get(temp.size()-1).reinsert(new Couple(nombres[0],nombres[1],0));
-                    }else{
-                        temp.get(temp.size()-1).reinsert(new Person(rLine,0));
-                    }
                 }
             }
-            if(!temp.isEmpty()&&!sets.isEmpty()){
-                for(Set set: temp){
-                    boolean SameSet=false;
-                    for(Set set2: sets){
-                        if(set2.size()==set.size()){
-                            for(int i=0;i<set.size();i++){
-                                if(set.get(i).getName().equals(set2.get(i).getName()))
-                                    SameSet=true;
-                                else
-                                    SameSet=false;
+            FileReader read = new FileReader(file);
+            BufferedReader reader = new BufferedReader(read);
+            ArrayList<Set> temp = new ArrayList();
+            String rLine;
+            while ((rLine = reader.readLine()) != null) {
+                if (rLine.contains("Set: ")) {
+                    temp.add(new Set(n));
+                } else if (rLine.contains(" y ")) {
+                    String[] nombres = rLine.split(" y ");
+                    temp.get(temp.size() - 1).reinsert(new Couple(nombres[0], nombres[1], 0));
+                } else {
+                    temp.get(temp.size() - 1).reinsert(new Person(rLine, 0));
+                }
+            }
+            if (!temp.isEmpty() && !sets.isEmpty()) {
+                for (Set set : temp) {
+                    boolean SameSet = false;
+                    for (Set set2 : sets) {
+                        if (set2.size() == set.size()) {
+                            for (int i = 0; i < set.size(); i++) {
+                                if (set.get(i).getName().equals(set2.get(i).getName())) {
+                                    SameSet = true;
+                                } else {
+                                    SameSet = false;
+                                }
                             }
-                            if(SameSet)
+                            if (SameSet) {
                                 return false;
+                            }
                         }
                     }
                 }
