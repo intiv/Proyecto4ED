@@ -66,7 +66,7 @@ public class Set {
         return false;
     }
     
-    public boolean add(Human persona, boolean forced) {
+    public boolean add(Human persona, boolean forced, boolean OneCouple) {
         if(persons==0)
             if(persona.getOriginalBreaks()>0)
                 return false;
@@ -75,11 +75,14 @@ public class Set {
                 return false;
             }
             if (persona instanceof Couple) {
-                if (persons <= max-2 && CoupleSlotAvailable()) {
-                    persona.reduce();
+                if (persons <= max-2 && OneCouple && CoupleSlotAvailable() ) {
+                    
                     members.add(persona);
                     persons++;
-                } else {
+                } else if(persons<=max-2 && !OneCouple){
+                    members.add(persona);
+                    persons++;
+                }else{
                     return false;
                 }
             } else if (persons <= max-1) {
@@ -88,8 +91,7 @@ public class Set {
             } else {
                 return false;
             }
-        }else{
-            
+        }else{           
             members.add(persona);
             if(!hasForced)
                 hasForced=true;

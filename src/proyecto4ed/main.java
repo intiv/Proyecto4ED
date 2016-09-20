@@ -37,27 +37,52 @@ public class main extends javax.swing.JFrame {
         grafo = new MultiGraph("Casas conocidas");
         grafo.setStrict(false);
 
-        try {
-            n = Integer.parseInt(JOptionPane.showInputDialog("Cuantos integrantes desea por grupo?"));
-            String op2 = JOptionPane.showInputDialog("Desea limitar una pareja por grupo? (Si/No)");
-            OneCouple = (op2.equals("Si") || op2.equals("si"));
-        } catch (InputMismatchException e) {
-            n = 5;
-            OneCouple = true;
-            JOptionPane.showMessageDialog(null, "Ingresó un input incorrecto. Se asignaron valores por default (5 persoans maximo y 1 pareja por grupo");
-        }
-
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jdSets = new javax.swing.JDialog();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        taSets = new javax.swing.JTextArea();
         bLoad = new javax.swing.JButton();
         bGenerate = new javax.swing.JButton();
         bDraw = new javax.swing.JButton();
         bVerify = new javax.swing.JButton();
         bExit = new javax.swing.JButton();
+
+        jLabel1.setFont(new java.awt.Font("Times New Roman", 3, 24)); // NOI18N
+        jLabel1.setText("Sets Generados");
+
+        taSets.setColumns(20);
+        taSets.setRows(5);
+        jScrollPane1.setViewportView(taSets);
+
+        javax.swing.GroupLayout jdSetsLayout = new javax.swing.GroupLayout(jdSets.getContentPane());
+        jdSets.getContentPane().setLayout(jdSetsLayout);
+        jdSetsLayout.setHorizontalGroup(
+            jdSetsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdSetsLayout.createSequentialGroup()
+                .addGroup(jdSetsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jdSetsLayout.createSequentialGroup()
+                        .addGap(23, 23, 23)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 365, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jdSetsLayout.createSequentialGroup()
+                        .addGap(126, 126, 126)
+                        .addComponent(jLabel1)))
+                .addContainerGap(27, Short.MAX_VALUE))
+        );
+        jdSetsLayout.setVerticalGroup(
+            jdSetsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jdSetsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 418, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(37, Short.MAX_VALUE))
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -138,7 +163,29 @@ public class main extends javax.swing.JFrame {
 
     private void bLoadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bLoadMouseClicked
         try {
-            if (personas.isEmpty()) {
+            //if(!jdSets.isVisible()){
+            boolean load = true;
+            if (!personas.isEmpty()) {
+                int decition = JOptionPane.showConfirmDialog(this, "Si selecciona ok, se borraran todos los datos (Personas, sets y grafo)", "Confirme borrar datos", JOptionPane.OK_CANCEL_OPTION);
+                if (decition == JOptionPane.OK_OPTION) {
+                    personas.clear();
+                    sets.clear();
+                    grafo.clear();
+                    load=true;
+                }else
+                    load=false;
+
+            }
+            if (load) {
+                try {
+                    n = Integer.parseInt(JOptionPane.showInputDialog("Cuantos integrantes desea por grupo?"));
+                    String op2 = JOptionPane.showInputDialog("Desea limitar una pareja por grupo? (Si/No)");
+                    OneCouple = (op2.equals("Si") || op2.equals("si"));
+                } catch (InputMismatchException | NumberFormatException e) {
+                    n = 5;
+                    OneCouple = true;
+                    JOptionPane.showMessageDialog(null, "Ingresó un input incorrecto. Se asignaron valores por default (5 personas maximo y 1 pareja por grupo");
+                }
                 String desktop = System.getProperty("user.home");
                 JFileChooser chooser = new JFileChooser(desktop + "/Desktop");
                 chooser.setAcceptAllFileFilterUsed(false);
@@ -150,9 +197,13 @@ public class main extends javax.swing.JFrame {
                         try (FileReader in = new FileReader(file); BufferedReader reader = new BufferedReader(in)) {
                             String line;
                             int people = 0;
+                            if (!personas.isEmpty()) {
+                                personas.clear();
+
+                            }
                             while ((line = reader.readLine()) != null) {
-                                if (line.contains(" y ")) {
-                                    String[] names = line.split(" y ");
+                                if (line.contains(" y ") || line.contains(" & ") || line.contains(" e ") || line.contains(" and ")) {
+                                    String[] names = line.contains(" y ") ? line.split(" y ") : (line.contains(" & ") ? line.split(" & ") : (line.contains(" e ") ? line.split(" e ") : line.split(" and ")));
                                     Couple pareja = new Couple(names[0], names[1], 0);
                                     personas.add(pareja);
                                     people += 2;
@@ -180,10 +231,11 @@ public class main extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(this, "Archivo incorrecto. Solo se aceptan archivos txt!");
                     }
                 }
-            } else {
-                JOptionPane.showMessageDialog(this, "Ya hay datos cargados");
+                /* }else{
+                JOptionPane.showMessageDialog(this, "Se están visualizando datos anteriormente cargados");
+            }*/
             }
-        } catch (IOException | NullPointerException e) {
+        } catch (IOException | NullPointerException | NumberFormatException e) {
             sets.clear();
             personas.clear();
             JOptionPane.showMessageDialog(this, "Ocurrio un error durante la carga de datos.\nIntente de nuevo y asegurese de seleccionar un archivo txt con el formato correcto");
@@ -196,13 +248,11 @@ public class main extends javax.swing.JFrame {
             long cont = 0;
             if (!personas.isEmpty()) {
                 for (Set set : sets) {
-
                     set.clear();
                 }
                 for (Human persona : personas) {
                     persona.SetAdded(false);
                 }
-                Collections.shuffle(personas);
                 boolean ValidSets = false;
                 while (!ValidSets) {
                     while (!AllPeopleAdded(personas)) {
@@ -224,52 +274,60 @@ public class main extends javax.swing.JFrame {
                         }
                         int index = rand.nextInt(sets.size());
                         if (cualpersona != -1) {
-                            System.out.println("Curr person " + personas.get(cualpersona) + " index: " + index + " cp: " + cualpersona);
+                            System.out.print("Curr person " + personas.get(cualpersona) + " index: " + index + " cp: " + cualpersona+"  ");
                             if (personas.get(cualpersona) instanceof Couple && OneCouple) {
-                                System.out.println("Entro a couples && onecouple");
                                 if (sets.get(index).CoupleFits(OneCouple)) {
                                     System.out.println(personas.get(cualpersona) + " entro a couple y onecouple");
                                     if (!sets.get(index).contains(personas.get(cualpersona))) {
-                                        if (sets.get(index).add(personas.get(cualpersona), false)) {
+                                        if (sets.get(index).add(personas.get(cualpersona), false,OneCouple)) {
                                             personas.get(cualpersona).SetAdded(true);
                                             cont = 0;
                                             if (sets.get(index).size() > 1) {
                                                 personas.get(cualpersona).reduce();
 
                                             }
-                                                
+
                                         }
                                     }
                                 } else if (allSetsFull(sets, personas.get(cualpersona), n) && !allCoupleSlotsTaken(sets)) {
-                                    System.out.println(personas.get(cualpersona) + " entro a !allcoupleslottaken");
+                                    System.out.println(" entro a !allcoupleslottaken");
                                     boolean forced = false;
                                     while (!forced) {
                                         int which = rand.nextInt(sets.size());
+                                        int counter = 0;
                                         if (sets.get(which).CoupleSlotAvailable()) {
                                             Human h1 = null;
                                             while (!forced) {
-                                                h1 = sets.get(which).remove(rand.nextInt(sets.get(which).size()));
+                                                h1 = sets.get(which).remove(1 + rand.nextInt(sets.get(which).size() - 1));
                                                 if (h1 instanceof Person) {
                                                     forced = true;
                                                 } else {
                                                     sets.get(which).reinsert(h1);
+                                                    h1 = null;
+                                                    counter++;
                                                 }
-
+                                                if (counter > sets.get(which).people() * n) {
+                                                    forced = true;
+                                                }
                                             }
 
-                                            forced = false;
                                             Human h2 = null;
+                                            if (counter > sets.get(which).people() * n) {
+                                                forced = true;
+                                            } else {
+                                                forced = false;
+                                            }
                                             while (!forced) {
-                                                h2 = sets.get(which).remove(rand.nextInt(sets.get(which).size()));
+                                                h2 = sets.get(which).remove(1 + rand.nextInt(sets.get(which).size() - 1));
                                                 if (h2 instanceof Person) {
                                                     forced = true;
                                                 } else {
                                                     sets.get(which).reinsert(h2);
                                                 }
                                             }
-                                            forced = false;
+
                                             if (h1 != null && h2 != null) {
-                                                if (sets.get(which).add(personas.get(cualpersona), true)) {
+                                                if (sets.get(which).add(personas.get(cualpersona), true,OneCouple)) {
                                                     personas.get(cualpersona).reduce();
                                                     personas.get(cualpersona).SetAdded(true);
                                                     personas.get(personas.indexOf(h1)).SetAdded(false);
@@ -279,39 +337,55 @@ public class main extends javax.swing.JFrame {
                                                     forced = true;
                                                     cont = 0;
                                                 }
+                                            } else {
+                                                cont++;
                                             }
                                         }
                                     }
                                 } else if (allSetsFull(sets, personas.get(cualpersona), n) && allCoupleSlotsTaken(sets)) {
-                                    System.out.println(personas.get(cualpersona) + " entro a allcoupleslottaken");
+                                    System.out.println(" entro a allcoupleslottaken");
                                     boolean forced = false;
                                     while (!forced) {
                                         int which = rand.nextInt(sets.size());
-
+                                        int counter = 0;
                                         Human h1 = null;
                                         while (!forced) {
-                                            h1 = sets.get(which).remove(rand.nextInt(sets.get(which).size()));
+                                            h1 = sets.get(which).remove(1 + rand.nextInt(sets.get(which).size() - 1));
                                             if (h1 instanceof Person) {
                                                 forced = true;
                                             } else {
                                                 sets.get(which).reinsert(h1);
+                                                h1 = null;
+                                                counter++;
                                             }
-
+                                            if (counter > sets.get(which).people() * n) {
+                                                forced = true;
+                                            }
                                         }
-                                        forced = false;
+
                                         Human h2 = null;
+                                        if (counter > sets.get(which).people() * n) {
+                                            forced = true;
+                                        } else {
+                                            forced = false;
+                                            counter = 0;
+                                        }
                                         while (!forced) {
-                                            h2 = sets.get(which).remove(rand.nextInt(sets.get(which).size()));
+                                            h2 = sets.get(which).remove(1 + rand.nextInt(sets.get(which).size() - 1));
                                             if (h2 instanceof Person) {
                                                 forced = true;
                                             } else {
                                                 sets.get(which).reinsert(h2);
+                                                h2 = null;
+                                                counter++;
+                                            }
+                                            if (counter > sets.get(which).people() * n) {
+                                                forced = true;
                                             }
                                         }
-                                        forced = false;
 
                                         if (h1 != null && h2 != null) {
-                                            if (sets.get(which).add(personas.get(cualpersona), true)) {
+                                            if (sets.get(which).add(personas.get(cualpersona), true,OneCouple)) {
                                                 personas.get(cualpersona).reduce();
                                                 personas.get(cualpersona).SetAdded(true);
                                                 personas.get(personas.indexOf(h1)).SetAdded(false);
@@ -320,6 +394,14 @@ public class main extends javax.swing.JFrame {
                                                 personas.get(personas.indexOf(h2)).revertbreaks();
                                                 forced = true;
                                                 cont = 0;
+                                            }
+                                        } else if (counter > sets.get(which).people() * n) {
+                                            cont++;
+                                            if (h1 != null) {
+                                                sets.get(which).reinsert(h1);
+                                            }
+                                            if (h2 != null) {
+                                                sets.get(which).reinsert(h2);
                                             }
                                         }
                                     }
@@ -345,13 +427,11 @@ public class main extends javax.swing.JFrame {
                                     }
                                 }
                             } else if (personas.get(cualpersona) instanceof Couple && !OneCouple) {
-                                System.out.println(personas.get(cualpersona) + " entro a couple y !onecouple");
                                 if (!allSetsFull(sets, personas.get(cualpersona), n)) {
                                     if (sets.get(index).CoupleFits(OneCouple)) {
-                                        System.out.println(personas.get(cualpersona) + " entro al else !onecouple");
-
+                                        System.out.println(" entro al if de !onecouple");
                                         if (!sets.get(index).contains(personas.get(cualpersona))) {
-                                            if (sets.get(index).add(personas.get(cualpersona), false)) {
+                                            if (sets.get(index).add(personas.get(cualpersona), false,OneCouple)) {
                                                 if (sets.get(index).people() > 1) {
                                                     personas.get(cualpersona).reduce();
                                                 }
@@ -361,33 +441,49 @@ public class main extends javax.swing.JFrame {
                                         }
                                     }
                                 } else if (!allSetsForced(sets)) {
-                                    System.out.println(personas.get(cualpersona) + " couple y !allsetsforced");
+                                    System.out.println(" entro a couple y !allsetsforced");
                                     boolean forced = false;
+
                                     while (!forced) {
                                         int which = rand.nextInt(sets.size());
+                                        int counter = 0;
                                         Human h1 = null;
                                         while (!forced) {
-                                            h1 = sets.get(which).remove(rand.nextInt(sets.get(which).size()));
+                                            h1 = sets.get(which).remove(1 + rand.nextInt(sets.get(which).size() - 1));
                                             if (h1 instanceof Person) {
                                                 forced = true;
                                             } else {
                                                 sets.get(which).reinsert(h1);
+                                                h1 = null;
+                                                counter++;
                                             }
-
+                                            if (counter > sets.get(which).people() * n) {
+                                                forced = true;
+                                            }
                                         }
-                                        forced = false;
+                                        if (counter > sets.get(which).people() * n) {
+                                            forced = true;
+                                        } else {
+                                            forced = false;
+                                            counter = 0;
+                                        }
                                         Human h2 = null;
                                         while (!forced) {
-                                            h2 = sets.get(which).remove(rand.nextInt(sets.get(which).size()));
+                                            h2 = sets.get(which).remove(1 + rand.nextInt(sets.get(which).size() - 1));
                                             if (h2 instanceof Person) {
                                                 forced = true;
                                             } else {
                                                 sets.get(which).reinsert(h2);
+                                                h2 = null;
+                                                counter++;
+                                            }
+                                            if (counter > sets.get(which).people() * n) {
+                                                forced = true;
                                             }
                                         }
-                                        forced = false;
+
                                         if (h1 != null && h2 != null) {
-                                            if (sets.get(which).add(personas.get(cualpersona), true)) {
+                                            if (sets.get(which).add(personas.get(cualpersona), true,OneCouple)) {
                                                 personas.get(cualpersona).reduce();
                                                 personas.get(cualpersona).SetAdded(true);
                                                 personas.get(personas.indexOf(h1)).SetAdded(false);
@@ -396,6 +492,14 @@ public class main extends javax.swing.JFrame {
                                                 personas.get(personas.indexOf(h2)).revertbreaks();
                                                 forced = true;
                                                 cont = 0;
+                                            }
+                                        } else {
+                                            cont++;
+                                            if (h1 != null) {
+                                                sets.get(which).reinsert(h1);
+                                            }
+                                            if (h2 != null) {
+                                                sets.get(which).reinsert(h2);
                                             }
                                         }
                                     }
@@ -467,9 +571,9 @@ public class main extends javax.swing.JFrame {
                             } else if (personas.get(cualpersona) instanceof Person) {
 
                                 if (sets.get(index).people() < n) {
-                                    System.out.println(personas.get(cualpersona) + " entro al primer if de person");
+                                    System.out.println( " entro al primer if de person");
                                     if (!sets.get(index).contains(personas.get(cualpersona))) {
-                                        if (sets.get(index).add(personas.get(cualpersona), false)) {
+                                        if (sets.get(index).add(personas.get(cualpersona), false,OneCouple)) {
                                             if (sets.get(index).people() > 1) {
                                                 personas.get(cualpersona).reduce();
                                             }
@@ -480,15 +584,16 @@ public class main extends javax.swing.JFrame {
                                     }
                                 } else if (allSetsFull(sets, personas.get(cualpersona), n) && !allSetsForced(sets)) {
                                     int which = LowestPackedUnforcedSet(sets);
-                                    System.out.println(personas.get(cualpersona) + " entro al primer else de person");
-                                    System.out.println(which);
+                                    System.out.println(" entro al primer else de person");
                                     //if (which != -1) {
-                                        if (sets.get(index).add(personas.get(cualpersona), true)) {
-                                            personas.get(cualpersona).SetAdded(true);
-                                            personas.get(cualpersona).reduce();
-                                            cont = 0;
-                                        }
-                                    /*} else {
+                                    if (sets.get(index).add(personas.get(cualpersona), true,OneCouple)) {
+                                        personas.get(cualpersona).SetAdded(true);
+                                        personas.get(cualpersona).reduce();
+                                        cont = 0;
+                                    }
+                                    /* 
+                                         
+                                        } else {
                                         which = LowestPackedSet(sets);
                                         if (which != -1) {
                                             if (sets.get(which).add(personas.get(cualpersona), true)) {
@@ -500,11 +605,10 @@ public class main extends javax.swing.JFrame {
                                             if(sets.get(index).add(personas.get(cualpersona), true))
                                     }*/
                                 } else if (allSetsFull(sets, personas.get(cualpersona), n) && allSetsForced(sets)) {
-                                    System.out.println(personas.get(cualpersona) + " entro al ultimo else de person");
+                                    System.out.println(" entro al ultimo else de person");
                                     int which = LowestPackedSet(sets);
-                                    System.out.println(personas.get(cualpersona) + ", " + which + "");
                                     if (which != -1) {
-                                        if (sets.get(which).add(personas.get(cualpersona), true)) {
+                                        if (sets.get(which).add(personas.get(cualpersona), true,OneCouple)) {
                                             personas.get(cualpersona).SetAdded(true);
                                             personas.get(cualpersona).reduce();
                                             cont = 0;
@@ -532,9 +636,7 @@ public class main extends javax.swing.JFrame {
                             }
                         }
                     }
-                    for (Human persona: personas) {
-                        persona.UpdateBreaks();
-                    }
+
                     if (dir.exists()) {
                         if (VerifySets(dir, sets, n)) {
                             ValidSets = true;
@@ -553,6 +655,9 @@ public class main extends javax.swing.JFrame {
                 }
 
                 if (ValidSets) {
+                    for (Human persona : personas) {
+                        persona.UpdateBreaks();
+                    }
                     for (Set set : sets) {
                         for (int i = 1; i < set.size(); i++) {
                             if (grafo.getNode(set.get(0).getName()) != null && grafo.getNode(set.get(i).getName()) != null) {
@@ -567,18 +672,25 @@ public class main extends javax.swing.JFrame {
                         }
                     }
 
+                    jdSets.pack();
+
+                    taSets.setText("");
+                    for (int i = 0; i < sets.size(); i++) {
+                        taSets.append("Set " + i + "\n------\n");
+                        for (int j = 0; j < sets.get(i).size(); j++) {
+                            if (j == 0) {
+                                taSets.append("Lider: ");
+                            }
+                            taSets.append(sets.get(i).get(j).toString() + "\n");
+                        }
+                    }
+                    if (!jdSets.isVisible()) {
+                        jdSets.setVisible(true);
+                    }
                     if (dir.exists()) {
                         dir.delete();
                     }
-
                     try (FileWriter out = new FileWriter(dir); BufferedWriter writer = new BufferedWriter(out)) {
-                        System.out.println("People");
-                        for (int i = 0; i < sets.size(); i++) {
-                            System.out.println("Set " + i + " size: " + sets.get(i).size());
-                            for (int j = 0; j < sets.get(i).size(); j++) {
-                                System.out.println(sets.get(i).get(j).toString());
-                            }
-                        }
                         for (int i = 0; i < sets.size(); i++) {
                             writer.write("Set: " + i + "\n");
                             for (int j = 0; j < sets.get(i).size(); j++) {
@@ -597,6 +709,7 @@ public class main extends javax.swing.JFrame {
     private void bDrawMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bDrawMouseClicked
         if (grafo.getEachNode() != null) {
             grafo.display(true).setCloseFramePolicy(Viewer.CloseFramePolicy.CLOSE_VIEWER);
+
         }
     }//GEN-LAST:event_bDrawMouseClicked
 
@@ -619,9 +732,12 @@ public class main extends javax.swing.JFrame {
     public static boolean VerifySets(File file, ArrayList<Set> sets, int n) {
         try {
             for (Set set : sets) {
-                if (set.get(0).getOriginalBreaks() != 2) {
-                    return false;
+                if (!set.isEmpty()) {
+                    if (set.get(0).getBreaks() != 2) {
+                        return false;
+                    }
                 }
+
             }
             FileReader read = new FileReader(file);
             BufferedReader reader = new BufferedReader(read);
@@ -667,12 +783,16 @@ public class main extends javax.swing.JFrame {
                 if (set.people() < n) {
                     return false;
                 }
+                if(set.isEmpty())
+                    return false;
             }
         } else {
             for (Set set : sets) {
                 if (set.people() < n - 1) {
                     return false;
                 }
+                if(set.isEmpty())
+                    return false;
             }
         }
         return true;
@@ -685,6 +805,16 @@ public class main extends javax.swing.JFrame {
             }
         }
         return true;
+    }
+
+    public static boolean CanExtractPersons(Set set) {
+        int cont = 0;
+        for (int i = 0; i < set.size(); i++) {
+            if (set.get(i) instanceof Person) {
+                cont++;
+            }
+        }
+        return cont >= 2;
     }
 
     public static boolean EveryoneKnowsEachOther(ArrayList<Human> personas, Graph grafo) {
@@ -790,5 +920,9 @@ public class main extends javax.swing.JFrame {
     private javax.swing.JButton bGenerate;
     private javax.swing.JButton bLoad;
     private javax.swing.JButton bVerify;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JDialog jdSets;
+    private javax.swing.JTextArea taSets;
     // End of variables declaration//GEN-END:variables
 }
